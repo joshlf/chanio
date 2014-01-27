@@ -35,9 +35,9 @@ func (r Reader) Read(p []byte) (int, error) {
 	return n, nil
 }
 
-type Writer chan<- byte
+type WriteCloser chan<- byte
 
-func (w Writer) Write(p []byte) (int, error) {
+func (w WriteCloser) Write(p []byte) (int, error) {
 	if len(p) < 1 {
 		return 0, nil
 	}
@@ -47,21 +47,21 @@ func (w Writer) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-func (w Writer) Close() error {
+func (w WriteCloser) Close() error {
 	close(w)
 	return nil
 }
 
-type ReadWriter chan byte
+type ReadWriteCloser chan byte
 
-func (r ReadWriter) Read(p []byte) (int, error) {
+func (r ReadWriteCloser) Read(p []byte) (int, error) {
 	return Reader(chan byte(r)).Read(p)
 }
 
-func (r ReadWriter) Write(p []byte) (int, error) {
-	return Writer(chan byte(r)).Write(p)
+func (r ReadWriteCloser) Write(p []byte) (int, error) {
+	return WriteCloser(chan byte(r)).Write(p)
 }
 
-func (r ReadWriter) Close() error {
-	return Writer(chan byte(r)).Close()
+func (r ReadWriteCloser) Close() error {
+	return WriteCloser(chan byte(r)).Close()
 }

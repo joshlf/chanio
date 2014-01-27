@@ -9,6 +9,12 @@ import (
 	"testing"
 )
 
+var (
+	_ io.Reader          = Reader(nil)
+	_ io.WriteCloser     = WriteCloser(nil)
+	_ io.ReadWriteCloser = ReadWriteCloser(nil)
+)
+
 func TestRead(t *testing.T) {
 	str := "hello, world!"
 	out := []byte(str)
@@ -54,7 +60,7 @@ func TestWrite(t *testing.T) {
 }
 
 func writeWithWriter(p []byte, c chan byte) {
-	for n, err := Writer(c).Write(p); len(p) > 0 && err == nil; n, err = Writer(c).Write(p) {
+	for n, err := WriteCloser(c).Write(p); len(p) > 0 && err == nil; n, err = WriteCloser(c).Write(p) {
 		p = p[n:]
 	}
 }
